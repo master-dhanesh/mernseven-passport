@@ -1,0 +1,21 @@
+<%- include("header")%>
+<!--  -->
+<%- include("nav")%>
+
+<!--  -->
+
+<h1>This is Signup</h1>
+
+<form action="/signup" method="POST">
+    <input type="text" placeholder="Username" name="username" />
+    <!--  -->
+    <input type="email" placeholder="Email" name="email" />
+    <!--  -->
+    <input type="password" name="password" placeholder="********" />
+    <button>Signup</button>
+    <br />
+    <p>Already have an account ? <a href="/signin">Signin</a></p>
+</form>
+
+<!--  -->
+<%- include("footer")%>

@@ -1,0 +1,25 @@
+<%- include("header")%>
+    <!--  -->
+    <%- include("nav")%>
+
+        <!--  -->
+        <h1>Registered Users.</h1>
+        <hr>
+        <form action="/search" method="POST">
+            <input type="text" placeholder="Search by username" name="username">
+        </form>
+        <hr>
+        <% users.forEach(function(user){ %>
+            <h2>
+                <%= user.username%>
+            </h2>
+            <p>
+                <%= user.email%>
+            </p>
+            <a href="/delete/<%= user._id%>">Delete</a>
+            <a href="/update/<%= user._id%>">Update</a>
+            <hr>
+            <% })%>
+
+                <!--  -->
+                <%- include("footer")%>

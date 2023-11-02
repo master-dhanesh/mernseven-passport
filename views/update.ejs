@@ -1,0 +1,21 @@
+<%- include("header")%>
+    <!--  -->
+    <%- include("nav")%>
+
+        <!--  -->
+
+        <h1>This is Update</h1>
+
+        <form action="/update/<%= user._id%>" method="POST">
+
+            <input value="<%= user.username%>" type="text" placeholder="Username" name="username">
+            <!--  -->
+            <input value="<%= user.email%>" type="email" placeholder="Email" name="email">
+            <!--  -->
+            <button>Update</button>
+
+        </form>
+
+
+        <!--  -->
+        <%- include("footer")%>

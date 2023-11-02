@@ -1,0 +1,14 @@
+<nav>
+    <% if(!admin) { %>
+
+    <a href="/">Home</a>
+    <a href="/signup">Signup</a>
+
+    <% } else { %>
+
+    <a href="/profile">Home</a>
+    <a href="/signout">Signout</a>
+
+    <% }%>
+    <a href="/about">About</a>
+</nav>
