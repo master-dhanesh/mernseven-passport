@@ -1,0 +1,16 @@
+<%- include("header")%>
+<!--  -->
+<%- include("nav")%>
+
+<!--  -->
+
+<h1>Forget Password</h1>
+
+<form action="/match-otp/<%= email%>" method="POST">
+    <input type="number" placeholder="ENTER OTP" name="otp" />
+    <button>Confirm</button>
+    <br />
+</form>
+
+<!--  -->
+<%- include("footer")%>

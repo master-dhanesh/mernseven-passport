@@ -106,31 +106,29 @@ router.post("/send-mail", async function (req, res, next) {
         const user = await User.findOne({ email: req.body.email });
         if (!user) return res.send("User not found");
 
-        const otp = Math.floor(1000 + Math.random() * 9000);
-        user.resetPasswordOtp = otp;
-        await user.save();
-        sendmailhandler(user.email, otp, res);
-        // code to open new page and compare otp
+        sendmailhandler(req, res, user);
     } catch (error) {
+        console.log(error);
         res.send(error);
     }
 });
 
-function sendmailhandler(email, otp, res) {
+function sendmailhandler(req, res, user) {
+    const otp = Math.floor(1000 + Math.random() * 9000);
     // admin mail address, which is going to be the sender
     const transport = nodemailer.createTransport({
         service: "gmail",
         host: "smtp.gmail.com",
         port: 465,
         auth: {
-            user: process.env.mail_email,
-            pass: process.env.mail_password,
+            user: "dhanesh1296@gmail.com",
+            pass: "tqwp jqms ekpk fphi",
         },
     });
     // receiver mailing info
     const mailOptions = {
         from: "Dhanesh Pvt. Ltd.<dhanesh1296@gmail.com>",
-        to: email,
+        to: user.email,
         subject: "Testing Mail Service",
         // text: req.body.message,
         html: `<h1>${otp}</h1>`,
@@ -139,9 +137,38 @@ function sendmailhandler(email, otp, res) {
     transport.sendMail(mailOptions, (err, info) => {
         if (err) return res.send(err);
         console.log(info);
-        return;
+        user.resetPasswordOtp = otp;
+        user.save();
+        res.render("otp", { admin: req.user, email: user.email });
     });
 }
+
+router.post("/match-otp/:email", async function (req, res, next) {
+    try {
+        const user = await User.findOne({ email: req.params.email });
+        if (user.resetPasswordOtp == req.body.otp) {
+            user.resetPasswordOtp = -1;
+            await user.save();
+            res.render("resetpassword", { admin: req.user, id: user._id });
+        } else {
+            res.send(
+                "Invalid OTP, Try Again <a href='/forget'>Forget Password</a>"
+            );
+        }
+    } catch (error) {
+        res.send(error);
+    }
+});
+
+router.post("/resetpassword/:id", async function (req, res, next) {
+    try {
+        const user = await User.findById(req.params.id);
+        await user.setPassword(req.body.password);
+        res.redirect("/signin");
+    } catch (error) {
+        res.send(error);
+    }
+});
 
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
