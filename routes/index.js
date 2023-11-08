@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const nodemailer = require("nodemailer");
 const User = require("../models/usermodel");
+const Post = require("../models/postModel");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 passport.use(new LocalStrategy(User.authenticate()));
@@ -53,9 +54,9 @@ router.get("/signout", isLoggedIn, function (req, res, next) {
 
 router.get("/profile", isLoggedIn, async function (req, res, next) {
     try {
-        // console.log(req.user);
-        const users = await User.find();
-        res.render("profile", { users: users, admin: req.user });
+        const user = await req.user.populate("posts");
+        console.log(user.posts);
+        res.render("profile", { admin: req.user, posts: user.posts });
     } catch (error) {
         res.send(error);
     }
@@ -170,6 +171,23 @@ router.post("/resetpassword/:id", async function (req, res, next) {
     }
 });
 
+router.get("/reset", isLoggedIn, async function (req, res, next) {
+    res.render("reset", { admin: req.user });
+});
+
+router.post("/reset", isLoggedIn, async function (req, res, next) {
+    try {
+        await req.user.changePassword(
+            req.body.oldpassword,
+            req.body.newpassword
+        );
+        await req.user.save();
+        res.redirect("/profile");
+    } catch (error) {
+        res.send(error);
+    }
+});
+
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
         next();
@@ -177,5 +195,25 @@ function isLoggedIn(req, res, next) {
         res.redirect("/signin");
     }
 }
+
+// ---------- post routes ----------
+
+router.get("/createpost", isLoggedIn, function (req, res, next) {
+    res.render("createpost", { admin: req.user });
+});
+
+router.post("/createpost", isLoggedIn, async function (req, res, next) {
+    try {
+        const post = new Post(req.body);
+        req.user.posts.push(post._id);
+        post.user = req.user._id;
+        // res.json(post);
+        await post.save();
+        await req.user.save();
+        res.redirect("/profile");
+    } catch (error) {
+        res.send(error);
+    }
+});
 
 module.exports = router;
