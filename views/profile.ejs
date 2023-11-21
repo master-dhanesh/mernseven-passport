@@ -12,8 +12,13 @@
 <% posts.forEach(function(p){ %>
 <h2><%= p.title%></h2>
 <p><%= p.description%></p>
-<a href="/delete/<%= p._id%>">Delete</a>
-<a href="/update/<%= p._id%>">Update</a>
+<p><a href="/like/<%= p._id%>">🩷</a> | <%= p.like.length%></p>
+
+<% if(admin.username === p.user.username){ %>
+<a href="/delete-post/<%= p._id%>">Delete</a>
+<a href="/update-post/<%= p._id%>">Update</a>
+
+<% } %>
 <hr />
 <% })%>
 

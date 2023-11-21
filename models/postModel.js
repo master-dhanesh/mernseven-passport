@@ -4,6 +4,7 @@ const postModel = new mongoose.Schema(
     {
         title: String,
         description: String,
+        like: [{ type: mongoose.Schema.Types.ObjectId, ref: "collectionname" }],
         user: { type: mongoose.Schema.Types.ObjectId, ref: "collectionname" },
     },
     { timestamps: true }

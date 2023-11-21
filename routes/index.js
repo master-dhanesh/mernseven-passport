@@ -54,9 +54,10 @@ router.get("/signout", isLoggedIn, function (req, res, next) {
 
 router.get("/profile", isLoggedIn, async function (req, res, next) {
     try {
-        const user = await req.user.populate("posts");
-        console.log(user.posts);
-        res.render("profile", { admin: req.user, posts: user.posts });
+        // const user = await req.user.populate("posts");
+        const posts = await Post.find().populate("user");
+        // console.log(user.posts);
+        res.render("profile", { admin: req.user, posts: posts });
     } catch (error) {
         res.send(error);
     }
@@ -212,6 +213,44 @@ router.post("/createpost", isLoggedIn, async function (req, res, next) {
         await req.user.save();
         res.redirect("/profile");
     } catch (error) {
+        res.send(error);
+    }
+});
+
+router.get("/delete-post/:id", isLoggedIn, async function (req, res, next) {
+    try {
+        const PostIndex = req.user.posts.findIndex(
+            (u) => u._id === req.params.id
+        );
+        req.user.posts.splice(PostIndex, 1);
+        await req.user.save();
+
+        await Post.findByIdAndDelete(req.params.id);
+        res.redirect("/profile");
+    } catch (error) {
+        res.send(error);
+    }
+});
+
+router.get("/like/:pid", isLoggedIn, async function (req, res, next) {
+    try {
+        // find the particular in which the changes happened
+        const posts = await Post.find();
+        const post = posts.find((p) => p._id == req.params.pid);
+        const postIndex = posts.findIndex((p) => p._id == req.params.pid);
+        if (post.like.includes(req.user._id) && post.like.length > 0) {
+            console.log("inside liked");
+            post.like.splice(postIndex, 1);
+        } else {
+            post.like.push(req.user._id);
+        }
+
+        posts[postIndex] = post;
+        await Post.findByIdAndUpdate(post._id, { like: post.like });
+        // await req.user.save();
+        res.redirect("/profile");
+    } catch (error) {
+        console.log(error);
         res.send(error);
     }
 });
